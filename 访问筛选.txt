@@ -3,38 +3,30 @@ https://dash.cloudflare.com/57bf80291239462c5a34bae69bacdf8f/troy-web.top/securi
 ([...new Set([...document.querySelectorAll('#react-app table tr td:nth-child(5)')].map(td => td.innerText.trim()).filter(text => text && text !== '/'))]).join('\n')
 
 ############
+https://dash.cloudflare.com/57bf80291239462c5a34bae69bacdf8f/workers/services/view/cloudflare-worker/production/observability/logs?workers-observability-view=invocations
 
-//2019/wp-includes/wlwmanifest.xml
-//2020/wp-includes/wlwmanifest.xml
-//blog/wp-includes/wlwmanifest.xml
-//cms/wp-includes/wlwmanifest.xml
-//shop/wp-includes/wlwmanifest.xml
-//site/wp-includes/wlwmanifest.xml
-//sito/wp-includes/wlwmanifest.xml
-//test/wp-includes/wlwmanifest.xml
-//web/wp-includes/wlwmanifest.xml
-//website/wp-includes/wlwmanifest.xml
-//wordpress/wp-includes/wlwmanifest.xml
-//wp1/wp-includes/wlwmanifest.xml
-//wp2/wp-includes/wlwmanifest.xml
-//xmlrpc.php
-/4.ipw.cn
-/ads.txt
-/blog-mdui/assets/css/global.css
-/blog-mdui/assets/js/History.js
-/blog-mdui/hacking/2022/05/10/unity-crack-lastevil.html
-/blog-mdui/manifest.json
-/blog-mdui/search.json
-/blog-mdui/unity/2019/03/02/windows-linux-netcore-server.html
-/favicon.ico
-/favicon.png
-/robots.txt
-/uploader
+#react-app > div > div > div > div.c_gc.c_gd.c_ge.c_d.c_gf.c_gg > div.w-full.h-full.bg-bg-secondary.-mb-\[48px\].pb-\[48px\] > div:nth-child(4) > div:nth-child(3) > div > div > div > tr:nth-child(220) > td.c_mk.c_mn.c_k.c_ma.c_cj.c_mb.c_be.c_bd.c_bc.c_me.c_mn.c_mg.c_mh.c_kv.c_kw.c_k.c_mm > span > span
+([...new Set([...document.querySelectorAll('#react-app div:nth-child(4) > div:nth-child(3) tr td span span')].map(td => td.innerText.trim().split(' ')[1]).filter(text => text && text !== '/'))]).join('\n')
 
-
+#######
 
 ##########
 http.request.uri.path contains "/wp-includes"  or
 http.request.uri.path wildcard "*/uploader"  or
 http.request.uri.path wildcard "*/xmlrpc.php" or
-http.request.uri.path wildcard "*/swagger"
+http.request.uri.path wildcard "*/.*" or
+http.request.uri.path wildcard "*/@*" or
+http.request.uri.path wildcard "*/graphql" or
+http.request.uri.path wildcard "*/telescope" or
+http.request.uri.path wildcard "*/login.action" or
+http.request.uri.path wildcard "*/config.json" or
+http.request.uri.path wildcard "*/swagger" or
+http.request.uri.path wildcard "*/api*" or
+http.request.uri.path wildcard "*/about" or
+http.request.uri.path wildcard "*/actuator" or
+http.request.uri.path wildcard "*/debug" or
+http.request.uri.path wildcard "*/ecp" or
+http.request.uri.path wildcard "*/s/*" or
+http.request.uri.path wildcard "*/_catalog" or
+http.request.uri.path wildcard "*/webjars" or
+http.request.uri.path wildcard "*/info.php"
