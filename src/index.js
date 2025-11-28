@@ -62,14 +62,23 @@ async function handle(request, env, ctx) {
 		if (request.headers.has('Referer')) {
 			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
 		} else {
-			proxyRequest.headers.set('Referer', toUrl.origin);
+			proxyRequest.headers.set('Referer', toUrl.origin + '/');
 		}
 		if (request.headers.has('Origin')) {
 			proxyRequest.headers.set('Origin', request.headers.get('Origin'));
 		} else {
 			proxyRequest.headers.set('Origin', toUrl.origin);
 		}
+
+		if (request.headers.has('Host')) {
+			proxyRequest.headers.set('Host', request.headers.get('Host'));
+		} else {
+			proxyRequest.headers.set('Host', toUrl.host);
+		}
 		proxyRequest.headers.set('User-Agent', userAgent)
+		proxyRequest.headers.set('accept', "*/*")
+		proxyRequest.headers.set('accept-encoding', "gzip, deflate, br, zstd")
+		proxyRequest.headers.set('accept-language', "zh-CN,zh;q=0.9,en;q=0.8")
 
 		console.log("转headers:")
 		for (const [key, value] of proxyRequest.headers.entries()) {
@@ -77,7 +86,19 @@ async function handle(request, env, ctx) {
 		}
 
 		console.log(toUrl.toString())
-		return fetch(proxyRequest);
+		try {
+			return fetch(proxyRequest);
+		} catch (error) {
+			console.log(error);
+
+			return new Response(error, {
+				status: 400,
+				headers: {
+					'Content-Type': 'text/plain; charset=utf8'
+				}
+			});
+		}
+
 
 	}
 	// return new Response("Hello")
