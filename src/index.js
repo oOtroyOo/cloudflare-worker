@@ -8,39 +8,69 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+const re = /^(http[s]?:\/\/)?([\w-]+\.)+[\w-]+(:\d+)?/i
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
+
+const exclude = ["favicon.ico"]
+
+
+/**
+ * example
+ * 	{HOST}/https://api.ip.sb/geoip/
+ *	{HOST}/https://github.com/clash-verge-rev/clash-verge-rev/releases/download/v2.4.3/Clash.Verge_2.4.3_x64-setup.exe
+ */
+/**
+ *
+ * @param {Request} request
+ * @param {*} env
+ * @param {*} ctx
+ * @returns
+*/
+async function handle(request, env, ctx) {
+	for (const key of exclude) {
+		if (request.url.includes(key)) {
+			return new Response(null, { status: 404 });
+		}
+
+	}
+	console.log(request.url);
+
+	const reqUrl = new URL(request.url)
+	if (request.headers) {
+		console.log("原headers:")
+		for (const [key, value] of request.headers.entries()) {
+			console.log(`${key}: ${value}`);
+		}
+
+	}
+	let pathBase = reqUrl.href.substring(reqUrl.origin.length + 1)
+	if (re.test(pathBase)) {
+		if (!pathBase.startsWith("http")) {
+			pathBase = `https://${pathBase}`;
+		}
+		const toUrl = new URL(pathBase)
+
+
+		const proxyRequest = new Request(toUrl, request);
+		if (request.headers.has('Referer')) {
+			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
+		} else {
+			proxyRequest.headers.set('Referer', toUrl.origin);
+		}
+		if (request.headers.has('Origin')) {
+			proxyRequest.headers.set('Origin', request.headers.get('Origin'));
+		} else {
+			proxyRequest.headers.set('Origin', toUrl.origin);
+		}
+		proxyRequest.headers.set('User-Agent', userAgent)
+		console.log(toUrl.toString())
+		return fetch(proxyRequest);
+
+	}
+	// return new Response("Hello")
+	throw new SyntaxError("未能匹配到转义URL");
+}
+
 export default {
-	/**
-	 *
-	 * @param {Request} request
-	 * @param {*} env
-	 * @param {*} ctx
-	 * @returns
-	 */
-	async fetch(request, env, ctx) {
-		const url = new URL(request.url);
-		let splitIndex = url.pathname.indexOf('/', 1)
-		if (splitIndex < 0) {
-			splitIndex = url.pathname.length
-		}
-		let host1 = url.pathname.substring(1, splitIndex)
-		if (/^([\w\-_]+\.)+[\w\-_]+/i.test(host1)) {
-
-			url.port = '443'
-			url.protocol = "https:"
-			url.hostname = host1;
-			url.pathname = url.pathname.substring(splitIndex)
-
-			const proxyRequest = new Request(url, request);
-			if (request.headers.has('Referer')) {
-				proxyRequest.headers.set('Referer', request.headers.get('Referer'));
-			} else {
-				proxyRequest.headers.set('Referer', `https://${host1}/`);
-			}
-
-			console.log(url.toString())
-			return fetch(proxyRequest);
-
-		}
-		return new Response("Hello")
-	},
-};
+	fetch: handle
+}
