@@ -56,6 +56,17 @@ async function handle(request, env, ctx) {
 
 
 		const proxyRequest = new Request(toUrl, request);
+		/** @type { string[]} */
+		let headerNames = []
+		for (const k in proxyRequest.headers.keys()) {
+			headerNames.push(k)
+		}
+		for (k in headerNames) {
+			if (k.startsWith('cf-')) {
+				proxyRequest.headers.delete(k)
+			}
+		}
+		proxyRequest.headers.getSetCookie()
 		if (request.headers.has('Referer')) {
 			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
 		} else {
@@ -67,12 +78,24 @@ async function handle(request, env, ctx) {
 			proxyRequest.headers.set('Origin', toUrl.origin);
 		}
 		proxyRequest.headers.set('User-Agent', userAgent)
+
+		console.log("转headers:")
+		for (const [key, value] of proxyRequest.headers.entries()) {
+			console.log(`${key}: ${value}`);
+		}
+
 		console.log(toUrl.toString())
 		return fetch(proxyRequest);
 
 	}
 	// return new Response("Hello")
-	throw new SyntaxError("未能匹配到转义URL");
+	return new Response('未能匹配到转义URL', {
+		status: 400,
+		headers: {
+			'Content-Type': 'text/plain; charset=utf8'
+		}
+	});
+
 }
 
 export default {

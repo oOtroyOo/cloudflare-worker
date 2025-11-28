@@ -1,0 +1,40 @@
+https://dash.cloudflare.com/57bf80291239462c5a34bae69bacdf8f/troy-web.top/security/analytics
+
+([...new Set([...document.querySelectorAll('#react-app table tr td:nth-child(5)')].map(td => td.innerText.trim()).filter(text => text && text !== '/'))]).join('\n')
+
+############
+
+//2019/wp-includes/wlwmanifest.xml
+//2020/wp-includes/wlwmanifest.xml
+//blog/wp-includes/wlwmanifest.xml
+//cms/wp-includes/wlwmanifest.xml
+//shop/wp-includes/wlwmanifest.xml
+//site/wp-includes/wlwmanifest.xml
+//sito/wp-includes/wlwmanifest.xml
+//test/wp-includes/wlwmanifest.xml
+//web/wp-includes/wlwmanifest.xml
+//website/wp-includes/wlwmanifest.xml
+//wordpress/wp-includes/wlwmanifest.xml
+//wp1/wp-includes/wlwmanifest.xml
+//wp2/wp-includes/wlwmanifest.xml
+//xmlrpc.php
+/4.ipw.cn
+/ads.txt
+/blog-mdui/assets/css/global.css
+/blog-mdui/assets/js/History.js
+/blog-mdui/hacking/2022/05/10/unity-crack-lastevil.html
+/blog-mdui/manifest.json
+/blog-mdui/search.json
+/blog-mdui/unity/2019/03/02/windows-linux-netcore-server.html
+/favicon.ico
+/favicon.png
+/robots.txt
+/uploader
+
+
+
+##########
+http.request.uri.path contains "/wp-includes"  or
+http.request.uri.path wildcard "*/uploader"  or
+http.request.uri.path wildcard "*/xmlrpc.php" or
+http.request.uri.path wildcard "*/swagger"
