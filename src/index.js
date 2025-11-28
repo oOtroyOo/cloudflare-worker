@@ -25,7 +25,7 @@ export default {
 		let host1 = url.pathname.substring(1, splitIndex)
 		if (/^([\w\-_]+\.)+[\w\-_]+/i.test(host1)) {
 
-			url.port = 443
+			url.port = '443'
 			url.protocol = "https:"
 			url.hostname = host1;
 			url.pathname = url.pathname.substring(splitIndex)
