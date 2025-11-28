@@ -61,11 +61,12 @@ async function handle(request, env, ctx) {
 		for (const k in proxyRequest.headers.keys()) {
 			headerNames.push(k)
 		}
-		for (k in headerNames) {
+		headerNames.forEach(k => {
 			if (k.startsWith('cf-')) {
 				proxyRequest.headers.delete(k)
 			}
-		}
+		});
+
 		proxyRequest.headers.getSetCookie()
 		if (request.headers.has('Referer')) {
 			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
