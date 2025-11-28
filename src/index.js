@@ -54,20 +54,11 @@ async function handle(request, env, ctx) {
 		}
 		const toUrl = new URL(pathBase)
 
-
-		const proxyRequest = new Request(toUrl, request);
-		/** @type { string[]} */
-		let headerNames = []
-		for (const k in proxyRequest.headers.keys()) {
-			headerNames.push(k)
-		}
-		headerNames.forEach(k => {
-			if (k.startsWith('cf-')) {
-				proxyRequest.headers.delete(k)
-			}
+		const proxyRequest = new Request(toUrl, {
+			method: request.method,
+			body: request.body,
+			referrer: request.referrer
 		});
-
-		proxyRequest.headers.getSetCookie()
 		if (request.headers.has('Referer')) {
 			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
 		} else {

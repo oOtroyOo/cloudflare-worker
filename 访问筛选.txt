@@ -16,17 +16,17 @@ http.request.uri.path wildcard "*/uploader"  or
 http.request.uri.path wildcard "*/xmlrpc.php" or
 http.request.uri.path wildcard "*/.*" or
 http.request.uri.path wildcard "*/@*" or
-http.request.uri.path wildcard "*/graphql" or
-http.request.uri.path wildcard "*/telescope" or
+http.request.uri.path wildcard "*/graphql*" or
+http.request.uri.path wildcard "*/telescope*" or
 http.request.uri.path wildcard "*/login.action" or
 http.request.uri.path wildcard "*/config.json" or
-http.request.uri.path wildcard "*/swagger" or
+http.request.uri.path wildcard "*/swagger*" or
 http.request.uri.path wildcard "*/api*" or
 http.request.uri.path wildcard "*/about" or
-http.request.uri.path wildcard "*/actuator" or
-http.request.uri.path wildcard "*/debug" or
-http.request.uri.path wildcard "*/ecp" or
+http.request.uri.path wildcard "*/actuator*" or
+http.request.uri.path wildcard "*/debug*" or
+http.request.uri.path wildcard "*/ecp*" or
 http.request.uri.path wildcard "*/s/*" or
 http.request.uri.path wildcard "*/_catalog" or
-http.request.uri.path wildcard "*/webjars" or
+http.request.uri.path wildcard "*/webjars*" or
 http.request.uri.path wildcard "*/info.php"
