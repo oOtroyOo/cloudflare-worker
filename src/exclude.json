@@ -1,0 +1,7 @@
+﻿[
+	"favicon.ico",
+	"[\\w-]+\\.json",
+	"[\\w-]+\\.html",
+	"info.php",
+	"login.action"
+]

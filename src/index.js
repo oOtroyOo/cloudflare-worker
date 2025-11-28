@@ -11,7 +11,7 @@
 const re = /^(http[s]?:\/\/)?([\w-]+\.)+[\w-]+(:\d+)?/i
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
 
-const exclude = ["favicon.ico"]
+const exclude = require('./exclude.json');
 
 
 /**
@@ -28,11 +28,15 @@ const exclude = ["favicon.ico"]
 */
 async function handle(request, env, ctx) {
 	for (const key of exclude) {
-		if (request.url.includes(key)) {
-			return new Response(null, { status: 404 });
-		}
+		try {
+			if (request.url.includes(key) || request.url.match(key)) {
+				return new Response(null, { status: 404 });
+			}
+		} catch (error) {
 
+		}
 	}
+
 	console.log(request.url);
 
 	const reqUrl = new URL(request.url)
