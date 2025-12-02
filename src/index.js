@@ -13,7 +13,6 @@ const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 
 const exclude = require('./exclude.json');
 
-
 /**
  * example
  * 	{HOST}/https://api.ip.sb/geoip/
@@ -36,7 +35,12 @@ async function handle(request, env, ctx) {
 
 		}
 	}
+	console.log(`env: ${JSON.stringify(env)}`);
+	let basePath = ""
 
+	if (env != undefined && env['BASE_PATH']) {
+		basePath = env['BASE_PATH']
+	}
 	console.log(request.url);
 
 	const reqUrl = new URL(request.url)
@@ -47,12 +51,18 @@ async function handle(request, env, ctx) {
 		}
 
 	}
-	let pathBase = reqUrl.href.substring(reqUrl.origin.length + 1)
-	if (re.test(pathBase)) {
-		if (!pathBase.startsWith("http")) {
-			pathBase = `https://${pathBase}`;
+	let urlBase = reqUrl.href.substring(reqUrl.origin.length)
+	if (urlBase.startsWith(basePath + "/")) {
+		urlBase = urlBase.substring(basePath.length + 1)
+	} else {
+		urlBase = urlBase.substring(1)
+	}
+
+	if (re.test(urlBase)) {
+		if (!urlBase.startsWith("http")) {
+			urlBase = `https://${urlBase}`;
 		}
-		const toUrl = new URL(pathBase)
+		const toUrl = new URL(urlBase)
 
 		const proxyRequest = new Request(toUrl, {
 			method: request.method,

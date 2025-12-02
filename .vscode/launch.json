@@ -10,7 +10,8 @@
 			"env": {
 				"HTTP_PROXY": "http://127.0.0.1:10809",
 				"HTTPS_PROXY": "http://127.0.0.1:10809",
-				"NO_PROXY": "localhost,127.0.0.1,192.*"
+				"NO_PROXY": "localhost,127.0.0.1,192.*",
+				"BASE_PATH": "/p"
 			},
 			"runtimeArgs": [
 				"run-script",
