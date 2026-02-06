@@ -26,101 +26,106 @@ const exclude = require('./exclude.json');
  * @returns
 */
 async function handle(request, env, ctx) {
-	for (const key of exclude) {
-		try {
-			if (request.url.includes(key) || request.url.match(key)) {
-				return new Response(null, { status: 404 });
-			}
-		} catch (error) {
+    for (const key of exclude) {
+        try {
+            if (request.url.includes(key) || request.url.match(key)) {
+                return new Response(null, { status: 404 });
+            }
+        } catch (error) {
 
-		}
-	}
-	console.log(`env: ${JSON.stringify(env)}`);
-	let basePath = ""
+        }
+    }
+    console.log(`env: ${JSON.stringify(env)}`);
+    let basePath = ""
 
-	if (env != undefined && env['BASE_PATH']) {
-		basePath = env['BASE_PATH']
-	}
-	console.log(request.url);
+    if (env != undefined && env['BASE_PATH']) {
+        basePath = env['BASE_PATH']
+    }
+    console.log(request.url);
 
-	const reqUrl = new URL(request.url)
-	if (request.headers) {
-		console.log("原headers:")
-		for (const [key, value] of request.headers.entries()) {
-			console.log(`${key}: ${value}`);
-		}
+    const reqUrl = new URL(request.url)
+    if (request.headers) {
+        console.log("原headers:")
+        for (const [key, value] of request.headers.entries()) {
+            console.log(`${key}: ${value}`);
+        }
 
-	}
-	let urlBase = reqUrl.href.substring(reqUrl.origin.length)
-	if (urlBase.startsWith(basePath + "/")) {
-		urlBase = urlBase.substring(basePath.length + 1)
-	} else {
-		urlBase = urlBase.substring(1)
-	}
+    }
+    let urlBase = reqUrl.href.substring(reqUrl.origin.length)
+    if (urlBase.startsWith(basePath + "/")) {
+        urlBase = urlBase.substring(basePath.length + 1)
+    } else {
+        urlBase = urlBase.substring(1)
+    }
 
-	if (re.test(urlBase)) {
-		if (!urlBase.startsWith("http")) {
-			urlBase = `https://${urlBase}`;
-		}
-		const toUrl = new URL(urlBase)
+    if (re.test(urlBase)) {
+        if (!urlBase.startsWith("http")) {
+            urlBase = `https://${urlBase}`;
+        }
+        const toUrl = new URL(urlBase)
 
-		const proxyRequest = new Request(toUrl, {
-			method: request.method,
-			body: request.body,
-			referrer: request.referrer
-		});
-		if (request.headers.has('Referer')) {
-			proxyRequest.headers.set('Referer', request.headers.get('Referer'));
-		} else {
-			proxyRequest.headers.set('Referer', toUrl.origin + '/');
-		}
-		if (request.headers.has('Origin')) {
-			proxyRequest.headers.set('Origin', request.headers.get('Origin'));
-		} else {
-			proxyRequest.headers.set('Origin', toUrl.origin);
-		}
+        const proxyRequest = new Request(toUrl, {
+            method: request.method,
+            body: request.body,
+            referrer: request.referrer
+        });
 
-		if (request.headers.has('Host')) {
-			proxyRequest.headers.set('Host', request.headers.get('Host'));
-		} else {
-			proxyRequest.headers.set('Host', toUrl.host);
-		}
-		proxyRequest.headers.set('User-Agent', userAgent)
-		proxyRequest.headers.set('accept', "*/*")
-		proxyRequest.headers.set('accept-encoding', "gzip, deflate, br, zstd")
-		proxyRequest.headers.set('accept-language', "zh-CN,zh;q=0.9,en;q=0.8")
+        for (const [key, value] of request.headers.entries()) {
+            proxyRequest.headers.set(key, value);
+        }
 
-		console.log("转headers:")
-		for (const [key, value] of proxyRequest.headers.entries()) {
-			console.log(`${key}: ${value}`);
-		}
+        proxyRequest.headers.set('Host', toUrl.host)
+        if (!request.headers.has('Referer')) {
+            proxyRequest.headers.set('Referer', toUrl.origin + '/');
+        }
 
-		console.log(toUrl.toString())
-		try {
-			return fetch(proxyRequest);
-		} catch (error) {
-			console.log(error);
+        if (!request.headers.has('Origin')) {
+            proxyRequest.headers.set('Origin', toUrl.origin);
+        }
+        if (!request.headers.has('User-Agent')) {
+            proxyRequest.headers.set('User-Agent', userAgent)
+        }
+        if (!request.headers.has('accept')) {
+            proxyRequest.headers.set('accept', "*/*")
+        }
+        if (!request.headers.has('accept-encoding')) {
+            proxyRequest.headers.set('accept-encoding', "gzip, deflate, br, zstd")
+        }
+        if (!request.headers.has('accept-language')) {
+            proxyRequest.headers.set('accept-language', "zh-CN,zh;q=0.9,en;q=0.8")
+        }
 
-			return new Response(error, {
-				status: 400,
-				headers: {
-					'Content-Type': 'text/plain; charset=utf8'
-				}
-			});
-		}
+        console.log("转headers:")
+        for (const [key, value] of proxyRequest.headers.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
+        console.log(toUrl.toString())
+        try {
+            return fetch(proxyRequest);
+        } catch (error) {
+            console.log(error);
+
+            return new Response(error, {
+                status: 400,
+                headers: {
+                    'Content-Type': 'text/plain; charset=utf8'
+                }
+            });
+        }
 
 
-	}
-	// return new Response("Hello")
-	return new Response('未能匹配到转义URL', {
-		status: 400,
-		headers: {
-			'Content-Type': 'text/plain; charset=utf8'
-		}
-	});
+    }
+    // return new Response("Hello")
+    return new Response('未能匹配到转义URL', {
+        status: 400,
+        headers: {
+            'Content-Type': 'text/plain; charset=utf8'
+        }
+    });
 
 }
 
 export default {
-	fetch: handle
+    fetch: handle
 }
