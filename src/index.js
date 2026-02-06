@@ -21,8 +21,8 @@ const exclude = require('./exclude.json');
 /**
  *
  * @param {Request} request
- * @param {*} env
- * @param {*} ctx
+ * @param {Cloudflare.Env} env
+ * @param {ExecutionContext} ctx
  * @returns
 */
 async function handle(request, env, ctx) {
@@ -44,13 +44,7 @@ async function handle(request, env, ctx) {
     console.log(request.url);
 
     const reqUrl = new URL(request.url)
-    if (request.headers) {
-        console.log("原headers:")
-        for (const [key, value] of request.headers.entries()) {
-            console.log(`${key}: ${value}`);
-        }
 
-    }
     let urlBase = reqUrl.href.substring(reqUrl.origin.length)
     if (urlBase.startsWith(basePath + "/")) {
         urlBase = urlBase.substring(basePath.length + 1)
@@ -69,32 +63,34 @@ async function handle(request, env, ctx) {
             body: request.body,
             referrer: request.referrer
         });
+        if (request.headers) {
+            console.log("原headers:")
+            for (const [key, value] of request.headers.entries()) {
+                console.log(`${key}: ${value}`);
+                proxyRequest.headers.set(key, value);
+            }
 
-        for (const [key, value] of request.headers.entries()) {
-            proxyRequest.headers.set(key, value);
-        }
+            proxyRequest.headers.set('Host', toUrl.host)
+            if (!request.headers.has('Referer')) {
+                proxyRequest.headers.set('Referer', toUrl.origin + '/');
+            }
 
-        proxyRequest.headers.set('Host', toUrl.host)
-        if (!request.headers.has('Referer')) {
-            proxyRequest.headers.set('Referer', toUrl.origin + '/');
+            if (!request.headers.has('Origin')) {
+                proxyRequest.headers.set('Origin', toUrl.origin);
+            }
+            if (!request.headers.has('User-Agent')) {
+                proxyRequest.headers.set('User-Agent', userAgent)
+            }
+            if (!request.headers.has('accept')) {
+                proxyRequest.headers.set('accept', "*/*")
+            }
+            if (!request.headers.has('accept-encoding')) {
+                proxyRequest.headers.set('accept-encoding', "gzip, deflate, br, zstd")
+            }
+            if (!request.headers.has('accept-language')) {
+                proxyRequest.headers.set('accept-language', "zh-CN,zh;q=0.9,en;q=0.8")
+            }
         }
-
-        if (!request.headers.has('Origin')) {
-            proxyRequest.headers.set('Origin', toUrl.origin);
-        }
-        if (!request.headers.has('User-Agent')) {
-            proxyRequest.headers.set('User-Agent', userAgent)
-        }
-        if (!request.headers.has('accept')) {
-            proxyRequest.headers.set('accept', "*/*")
-        }
-        if (!request.headers.has('accept-encoding')) {
-            proxyRequest.headers.set('accept-encoding', "gzip, deflate, br, zstd")
-        }
-        if (!request.headers.has('accept-language')) {
-            proxyRequest.headers.set('accept-language', "zh-CN,zh;q=0.9,en;q=0.8")
-        }
-
         console.log("转headers:")
         for (const [key, value] of proxyRequest.headers.entries()) {
             console.log(`${key}: ${value}`);
