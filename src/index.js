@@ -8,6 +8,8 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+import EdnovasHandle from './EdnovasHandle.js';
+import BaseHandle from './BaseHandle.js';
 const re = /^(http[s]?:\/\/)?([\w-]+\.)+[\w-]+(:\d+)?/i
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36'
 
@@ -19,6 +21,10 @@ import exclude from './exclude.json' assert { type: 'json' };
  */
 
 export default {
+    /** @type {BaseHandle} */
+    handles: [
+        new EdnovasHandle()
+    ],
     /**
      *
      * @param {Request} request
@@ -46,11 +52,21 @@ export default {
 
         const reqUrl = new URL(request.url)
 
-        let urlBase = reqUrl.href.substring(reqUrl.origin.length)
+        let urlBase = reqUrl.pathname
         if (urlBase.startsWith(basePath + "/")) {
             urlBase = urlBase.substring(basePath.length + 1)
         } else {
             urlBase = urlBase.substring(1)
+        }
+
+        /** @type {BaseHandle} */
+        const find = this.handles.find(h => h.test(urlBase))
+        if (find) {
+            try {
+                return await find.handle(request, env, ctx)
+            } catch (error) {
+                console.error(error)
+            }
         }
 
         if (re.test(urlBase)) {
@@ -101,7 +117,7 @@ export default {
             try {
                 return fetch(proxyRequest);
             } catch (error) {
-                console.log(error);
+                console.error(error);
 
                 return new Response(error, {
                     status: 400,
