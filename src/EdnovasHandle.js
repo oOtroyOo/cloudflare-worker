@@ -138,7 +138,7 @@ export default class EdnovasHandle extends BaseHandle {
                     });
 
                     const body = response.json()
-                    return { url }
+                    return resolve({ url })
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
 
@@ -163,8 +163,7 @@ export default class EdnovasHandle extends BaseHandle {
         try {
 
             let response = await fetch(`https://${this.successUrl}/api/v1/user/info`, {
-                headers: { "Authorization": kv_auth },
-                signal: controller.signal
+                headers: { "Authorization": kv_auth }
             });
             let result = await response.json();
 
@@ -199,8 +198,7 @@ export default class EdnovasHandle extends BaseHandle {
         try {
             let response = await fetch(`https://${this.successUrl}/api/v1/passport/auth/login`, {
                 method: "POST",
-                body: formData,
-                timeout: 3000
+                body: formData
             });
             let result = await response.json();
 
