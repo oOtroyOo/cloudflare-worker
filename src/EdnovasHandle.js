@@ -129,13 +129,15 @@ export default class EdnovasHandle extends BaseHandle {
         const fetchPromises = this.allowed_domains.map(url =>
             new Promise(async (resolve, reject) => {
                 const controller = new AbortController();
+                let response = undefined
                 const id = setTimeout(() => controller.abort(), 3000);
                 try {
 
-                    let response = await fetch(`https://${url}/api/v1/user/info`, {
+                    response = await fetch(`https://${url}/api/v1/guest/comm/config`, {
                         signal: controller.signal
                     });
-                    response.body.cancel()
+
+                    const body = response.json()
                     return url
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
@@ -143,6 +145,7 @@ export default class EdnovasHandle extends BaseHandle {
                     reject(error)
                 } finally {
                     clearTimeout(id)
+                    response?.body.cancel()
                 }
             })
         );
