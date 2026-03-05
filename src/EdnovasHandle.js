@@ -23,6 +23,13 @@ export default class EdnovasHandle extends BaseHandle {
         "ednovas.tech"
     ]
 
+    client_flag = {
+        clash: "clash",
+        surge: "surge",
+        vmess: "vmess",
+        v2ray: "vmess"
+    }
+
 
     auth_data = undefined
 
@@ -31,7 +38,7 @@ export default class EdnovasHandle extends BaseHandle {
      * @param {string} urlBase
      * @returns {boolean}
      */
-    async test(urlBase) {
+    test(urlBase) {
         return super.test(urlBase) || urlBase.toLowerCase().startsWith("ednovas/")
     }
     /**
@@ -47,6 +54,9 @@ export default class EdnovasHandle extends BaseHandle {
         const email = reqUrl.searchParams.get("email")
         const password = reqUrl.searchParams.get("password")
 
+        if (!this.successUrl) {
+            await this.findUrl()
+        }
         if (!this.auth_data) {
             try {
                 console.log("try get KV Store");
@@ -82,8 +92,17 @@ export default class EdnovasHandle extends BaseHandle {
                 flag: "clash"
             }
             const clientAgent = request.headers.get("User-Agent")
-            if (clientAgent.toLowerCase().indexOf("clash") > -1) {
-                data.flag = "clash"
+            for (const [k, v] of Object.entries(this.client_flag)) {
+                if (clientAgent.toLowerCase().indexOf(k) > -1) {
+                    data.flag = v;
+                }
+            }
+
+            if (clientAgent.toLowerCase().indexOf("surge") > -1) {
+                data.flag = "surge"
+            }
+            if (clientAgent.toLowerCase().indexOf("vmess") > -1) {
+                data.flag = "vmess"
             }
             const downloadUrl = `https://${this.successUrl}/api/v1/user/downloadConfig`
             console.log(downloadUrl)
@@ -106,35 +125,58 @@ export default class EdnovasHandle extends BaseHandle {
         }
     }
 
-    async user(kv_auth) {
+    async findUrl() {
         const fetchPromises = this.allowed_domains.map(url =>
             new Promise(async (resolve, reject) => {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), 3000);
                 try {
+
                     let response = await fetch(`https://${url}/api/v1/user/info`, {
-                        headers: { "Authorization": kv_auth },
-                        timeout: 3000
+                        signal: controller.signal
                     });
-                    let result = await response.json();
-
-                    if (result.data && result.data) {
-                        console.log(`${url} user success auth_data: ${result.data.email }`);
-
-                        resolve({ successUrl: url, auth_data: result.data })
-                    }
-                    else {
-                        reject(`reject ${url} Login failed`)
-                    }
+                    return url
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
 
                     reject(error)
+                } finally {
+                    clearTimeout(id)
                 }
             })
         );
 
-        const { successUrl, user } = await this.waitAnySuccess(fetchPromises);
-        this.successUrl = successUrl
-        this.auth_data = kv_auth
+        const results = await this.waitAnySuccess(fetchPromises);
+        if (results) {
+            this.successUrl = successUrl
+            this.auth_data = kv_auth
+        } else {
+            throw new Error("无法找到successUrl")
+        }
+    }
+    async user(kv_auth) {
+
+        try {
+
+            let response = await fetch(`https://${this.successUrl}/api/v1/user/info`, {
+                headers: { "Authorization": kv_auth },
+                signal: controller.signal
+            });
+            let result = await response.json();
+
+            if (result.data && result.data) {
+                console.log(`${url} user success auth_data: ${result.data.email}`);
+
+                this.auth_data = result.data
+            }
+            else {
+                console.error(`reject ${this.successUrl} Login failed`)
+                this.auth_data = undefined
+            }
+        } catch (error) {
+            console.log(`reject ${url} ${error} `);
+
+        }
     }
 
     /**
@@ -149,42 +191,26 @@ export default class EdnovasHandle extends BaseHandle {
         const formData = new FormData();
         formData.append('email', email);
         formData.append('password', password);
-        const fetchPromises = this.allowed_domains.map(url =>
-            new Promise(async (resolve, reject) => {
-                try {
-                    let response = await fetch(`https://${url}/api/v1/passport/auth/login`, {
-                        method: "POST",
-                        body: formData,
-                        timeout: 3000
-                    });
-                    let result = await response.json();
-
-                    if (result.data && result.data.auth_data) {
-                        console.log(`${url} login success auth_data: ${result.data.auth_data}`);
-
-                        resolve({ successUrl: url, auth_data: result.data.auth_data })
-                    }
-                    else {
-                        reject(`reject ${url} Login failed`)
-                    }
-                } catch (error) {
-                    console.log(`reject ${url} ${error} `);
-
-                    reject(error)
-                }
-            })
-        );
-
-        const { successUrl, auth_data } = await this.waitAnySuccess(fetchPromises);
 
         try {
-            console.log("try put KV Store");
-            await env.KV_STORE.put("ednovas_auth_data", auth_data)
+            let response = await fetch(`https://${this.successUrl}/api/v1/passport/auth/login`, {
+                method: "POST",
+                body: formData,
+                timeout: 3000
+            });
+            let result = await response.json();
+
+            if (result.data && result.data.auth_data) {
+                console.log(`${url} login success auth_data: ${result.data.auth_data}`);
+
+                this.auth_data = result.data.auth_data
+            }
+            else {
+                console.error(`reject ${url} Login failed`)
+            }
         } catch (error) {
-            console.error(error)
+            console.error(`reject ${url} ${error} `);
         }
-        this.successUrl = successUrl;
-        this.auth_data = auth_data;
     }
 
     async waitAnySuccess(fetchPromise) {

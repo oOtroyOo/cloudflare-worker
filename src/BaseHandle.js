@@ -5,7 +5,7 @@
      * @param {string} urlBase
      * @returns {boolean}
      */
-    async test(urlBase) {
+    test(urlBase) {
         this.lastTestUrl = urlBase
         return false
     }

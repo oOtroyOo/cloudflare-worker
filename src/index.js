@@ -21,7 +21,7 @@ import exclude from './exclude.json' assert { type: 'json' };
  */
 
 export default {
-    /** @type {BaseHandle} */
+    /** @type {BaseHandle[]} */
     handles: [
         new EdnovasHandle()
     ],
@@ -66,6 +66,12 @@ export default {
                 return await find.handle(request, env, ctx)
             } catch (error) {
                 console.error(error)
+                return new Response(error, {
+                    status: 400,
+                    headers: {
+                        'Content-Type': 'text/plain; charset=utf8'
+                    }
+                });
             }
         }
 
