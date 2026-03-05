@@ -63,7 +63,8 @@ export default {
             /** @type {BaseHandle} */
             const find = this.handles.find(h => h.test(urlBase))
             if (find) {
-                return await find.handle(request, env, ctx)
+                const resp = await find.handle(request, env, ctx)
+                if (resp) return resp
             }
 
             if (re.test(urlBase)) {
