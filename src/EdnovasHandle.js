@@ -171,7 +171,7 @@ export default class EdnovasHandle extends BaseHandle {
             if (result.data && result.data) {
                 console.log(`${this.successUrl} user success auth_data: ${result.data.email}`);
 
-                this.auth_data = result.data
+                this.auth_data = kv_auth
             }
             else {
                 console.error(`reject ${this.successUrl} Login failed`)
