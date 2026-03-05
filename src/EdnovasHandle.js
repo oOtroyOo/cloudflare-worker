@@ -138,7 +138,7 @@ export default class EdnovasHandle extends BaseHandle {
                     });
 
                     const body = response.json()
-                    return url
+                    return { url }
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
 
@@ -152,8 +152,8 @@ export default class EdnovasHandle extends BaseHandle {
 
         const results = await this.waitAnySuccess(fetchPromises);
         if (results) {
+            const { successUrl } = results
             this.successUrl = successUrl
-            this.auth_data = kv_auth
         } else {
             throw new Error("无法找到successUrl")
         }
