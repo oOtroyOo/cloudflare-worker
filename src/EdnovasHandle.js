@@ -138,7 +138,7 @@ export default class EdnovasHandle extends BaseHandle {
                     });
 
                     const body = response.json()
-                    return resolve({ url })
+                    return resolve({ successUrl: url })
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
 
@@ -154,6 +154,7 @@ export default class EdnovasHandle extends BaseHandle {
         if (results) {
             const { successUrl } = results
             this.successUrl = successUrl
+            console.log(`successUrl = ${this.successUrl}`);
         } else {
             throw new Error("无法找到successUrl")
         }
