@@ -63,17 +63,7 @@ export default {
             /** @type {BaseHandle} */
             const find = this.handles.find(h => h.test(urlBase))
             if (find) {
-                try {
-                    return await find.handle(request, env, ctx)
-                } catch (error) {
-                    console.error(error)
-                    return new Response(error, {
-                        status: 400,
-                        headers: {
-                            'Content-Type': 'text/plain; charset=utf8'
-                        }
-                    });
-                }
+                return await find.handle(request, env, ctx)
             }
 
             if (re.test(urlBase)) {

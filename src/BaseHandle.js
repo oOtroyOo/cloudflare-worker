@@ -14,9 +14,14 @@
      * @param {Request} request
      * @param {Cloudflare.Env} env
      * @param {ExecutionContext} ctx
-     * @returns {Response}
+     * @returns {Promise<Response>}
     */
     async handle(request, env, ctx) {
-
+        return new Response("OK", {
+            status: 200,
+            headers: {
+                'Content-Type': 'text/plain; charset=utf8'
+            }
+        });
     }
 }

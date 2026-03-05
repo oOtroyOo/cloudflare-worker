@@ -46,7 +46,7 @@ export default class EdnovasHandle extends BaseHandle {
      * @param {Request} request
      * @param {Cloudflare.Env} env
      * @param {ExecutionContext} ctx
-     * @returns {Response}
+     * @returns {Promise<Response>}
     */
     async handle(request, env, ctx) {
 
