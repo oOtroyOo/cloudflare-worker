@@ -168,7 +168,7 @@ export default class EdnovasHandle extends BaseHandle {
             let result = await response.json();
 
             if (result.data && result.data) {
-                console.log(`${url} user success auth_data: ${result.data.email}`);
+                console.log(`${this.successUrl} user success auth_data: ${result.data.email}`);
 
                 this.auth_data = result.data
             }
@@ -177,7 +177,7 @@ export default class EdnovasHandle extends BaseHandle {
                 this.auth_data = undefined
             }
         } catch (error) {
-            console.log(`reject ${url} ${error} `);
+            console.log(`reject ${this.successUrl} ${error} `);
 
         }
     }
@@ -203,15 +203,15 @@ export default class EdnovasHandle extends BaseHandle {
             let result = await response.json();
 
             if (result.data && result.data.auth_data) {
-                console.log(`${url} login success auth_data: ${result.data.auth_data}`);
+                console.log(`${this.successUrl} login success auth_data: ${result.data.auth_data}`);
 
                 this.auth_data = result.data.auth_data
             }
             else {
-                console.error(`reject ${url} Login failed`)
+                console.error(`reject ${this.successUrl} Login failed`)
             }
         } catch (error) {
-            console.error(`reject ${url} ${error} `);
+            console.error(`reject ${this.successUrl} ${error} `);
         }
     }
 
