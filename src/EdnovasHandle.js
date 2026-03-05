@@ -135,6 +135,7 @@ export default class EdnovasHandle extends BaseHandle {
                     let response = await fetch(`https://${url}/api/v1/user/info`, {
                         signal: controller.signal
                     });
+                    response.body.cancel()
                     return url
                 } catch (error) {
                     console.log(`reject ${url} ${error} `);
